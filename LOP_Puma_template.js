@@ -14,6 +14,7 @@ $(document).ready(function() {
     //get name of current list
     var url = window.location.href;
     var relativeUrl = url.replace("https://vts5.bmwgroup.net", "");
+    var $copySigns = $("img[src='" + urlCopySign + "']");
     currentListName = $("#pageTitle").find("a[href='" + relativeUrl + "']").text();
 
     $SP().list(currentListName).info(function(fields) {
@@ -35,6 +36,11 @@ $(document).ready(function() {
             var numberOfRows = data.length;
             for (var j = 0; j < numberOfRows; j++) {
                 infoText[j] = "";
+                //while we're at it, we hand over the id to the copy signs
+                $copySigns.each(function(index, value) {
+                    $(this).data("rowID", data[j].getAttribute("ID"));
+                    alert(data[j].getAttribute("ID"));
+                });
                 for (var i = 0; i < numberOfHiddenColumns; i++) {
                     var currentColumnName = arrayOfHiddenColumns[i];
                     var currentColumnNumber = nameColumnNumberMap[currentColumnName];
@@ -54,13 +60,17 @@ $(document).ready(function() {
             $infoSigns.each(function(index, value) {
                 $(this).wrap(bootstrapTooltip + infoText[index] + '"></a>');
                 $(this).closest("a").tooltip();
-            })
+            });
+            implementCopyFunction();
         })
     });
+})
+
+
+var implementCopyFunction = function() {
     $SP().lists(function(list) {
-        var availableListsSelect = "<select id='availableListsSelect'>";
+        var availableListsSelect = "<select id='availableListsSelect' style='margin-bottom: 10px;'>";
         var numberOfAvailableLists = list.length;
-        var $copySigns = $("img[src='" + urlCopySign + "']");
         var typeOfList;
         //get the select to display only suitable lists for copying
         if (currentListName.indexOf("LOP") !== -1) {
@@ -71,7 +81,7 @@ $(document).ready(function() {
             typeOfList = "MeP"
         };
         for (var i = 0; i < numberOfAvailableLists; i++) {
-            if (list[i]['Name'].indexOf("LOP") !== -1) {
+            if (list[i]['Name'].indexOf(typeOfList) !== -1) {
                 availableListsSelect += "<option>" + list[i]['Name'] + "</option>";
             }
         };
@@ -79,13 +89,36 @@ $(document).ready(function() {
         $copySigns.each(function(index, value) {
             $(this).wrap('<a href="#modular' + index + '" rel="modal:open"></a>');
             $(".appendModales").append('<div id="modular' + index + '" style="display:none;">' +
-                '<p>In welche Liste möchten Sie die Daten kopieren?</p><p>' + availableListsSelect +
+                '<p>In welche Liste möchten Sie die Daten kopieren? ID: ' + $(this).data("rowID") + '</p><p>' + availableListsSelect +
                 '</p><a href="#" rel="modal:close"><button class = "btn btn-default">Abbrechen</button></a>' +
                 '<button class="btn btn-default" id="Kopiere' + index + '"" style="float: right">Kopieren</button>');
             $("#Kopiere" + index).click(function() {
-                console.log("Kopiere Index " + index + " in Liste " + $("#availableListsSelect option:selected").text());
+                updateListItem();
             });
         });
     });
+}
 
-})
+function updateListItem(itemId) {
+
+    var clientContext = new SP.ClientContext(siteUrl);
+    var oList = clientContext.get_web().get_lists().getByTitle('My List');
+
+    this.oListItem = oList.getItemById(itemId);
+
+    oListItem.set_item('MyField', 'My Updated Field Value');
+
+    oListItem.update();
+
+    clientContext.executeQueryAsync(Function.createDelegate(this, this.onQuerySucceeded), Function.createDelegate(this, this.onQueryFailed));
+}
+
+var onQuerySucceeded = function() {
+
+    alert('Item updated!');
+}
+
+var onQueryFailed = function(sender, args) {
+
+    alert('Request failed. ' + args.get_message() + '\n' + args.get_stackTrace());
+}
