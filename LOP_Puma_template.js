@@ -34,11 +34,6 @@ $(document).ready(function() {
             var arrayOfHiddenColumns = [columnGeaendertAm, columnGeaendertVon, columnErfasstAm, columnErstelltVon, columnCopyHistory];
             var numberOfHiddenColumns = arrayOfHiddenColumns.length;
             var numberOfRows = data.length;
-            //while we're at it, we hand over the id to the copy signs
-            $copySigns.each(function(index, value) {
-                $(this).closest("a").data("rowID", data[index].getAttribute("ID"));
-                alert($(this).closest("a").data("rowID"));
-            });
             for (var j = 0; j < numberOfRows; j++) {
                 infoText[j] = "";
                 for (var i = 0; i < numberOfHiddenColumns; i++) {
@@ -60,37 +55,41 @@ $(document).ready(function() {
             $infoSigns.each(function(index, value) {
                 $(this).wrap(bootstrapTooltip + infoText[index] + '"></a>');
                 $(this).closest("a").tooltip();
-            })
+            });
+            $SP().lists(function(list) {
+                var availableListsSelect = document.createElement("select");
+                // availableListsSelect.id = "availableListsSelect";
+                var numberOfAvailableLists = list.length;
+                var typeOfList;
+                //get the select to display only suitable lists for copying
+                if (currentListName.indexOf("LOP") !== -1) {
+                    typeOfList = "LOP";
+                } else if (currentListName.indexOf("PUMA") !== -1) {
+                    typeOfList = "PUMA"
+                } else {
+                    typeOfList = "MeP"
+                };
+                for (var i = 0; i < numberOfAvailableLists; i++) {
+                    var currentListChecked = list[i]['Name'];
+                    if (currentListChecked.indexOf("LOP") !== -1) {
+                        var option = document.createElement("option");
+                        option.value = currentListChecked;
+                        option.text = currentListChecked;
+                        availableListsSelect.appendChild(option);
+                    }
+                };
+                $copySigns.each(function(index, value) {
+                    $(this).wrap('<a href="#modular' + index + '" rel="modal:open"></a>');
+                    $(".appendModales").append('<div id="modular' + index + '" style="display:none;">' +
+                        '<p>In welche Liste möchten Sie die Daten kopieren?</p><div id="appendSelectHere"></div><a href="#" rel="modal:close"><button class = "btn btn-default">Abbrechen</button></a>' +
+                        '<button class="btn btn-default" id="Kopiere' + index + '"" style="float: right">Kopieren</button>');
+                    document.getElementById("appendSelectHere").appendChild(availableListsSelect);
+                    $("#Kopiere" + index).click(function() {
+                        console.log("Kopiere Index " + index + " in Liste " + $("#availableListsSelect").find(":selected").text());
+                        alert(data[index].getAttribute("ID"));
+                    });
+                });
+            });
         })
     });
-    $SP().lists(function(list) {
-        var availableListsSelect = "<select id='availableListsSelect'>";
-        var numberOfAvailableLists = list.length;
-        var typeOfList;
-        //get the select to display only suitable lists for copying
-        if (currentListName.indexOf("LOP") !== -1) {
-            typeOfList = "LOP";
-        } else if (currentListName.indexOf("PUMA") !== -1) {
-            typeOfList = "PUMA"
-        } else {
-            typeOfList = "MeP"
-        };
-        for (var i = 0; i < numberOfAvailableLists; i++) {
-            if (list[i]['Name'].indexOf("LOP") !== -1) {
-                availableListsSelect += "<option>" + list[i]['Name'] + "</option>";
-            }
-        };
-        availableListsSelect += "</select>";
-        $copySigns.each(function(index, value) {
-            $(this).wrap('<a href="#modular' + index + '" rel="modal:open"></a>');
-            $(".appendModales").append('<div id="modular' + index + '" style="display:none;">' +
-                '<p>In welche Liste möchten Sie die Daten kopieren?</p><p>' + availableListsSelect +
-                '</p><a href="#" rel="modal:close"><button class = "btn btn-default">Abbrechen</button></a>' +
-                '<button class="btn btn-default" id="Kopiere' + index + '"" style="float: right">Kopieren</button>');
-            $("#Kopiere" + index).click(function() {
-                console.log("Kopiere Index " + index + " in Liste " + $("#availableListsSelect option:selected").text());
-            });
-        });
-    });
-
 })

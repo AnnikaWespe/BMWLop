@@ -13,6 +13,6 @@
 		<link href="/sites/VSC/LOP%20%20Puma%20Scripts/jquery.modal.css" rel="stylesheet" media="screen">
 		<link href="/sites/VSC/LOP%20%20Puma%20Scripts/scripts/LOP_Puma_template.css" rel="stylesheet" type="text/css"/>
 	</head>
-	<div class="appendModales"></div>
+	<div class="appendModales">Here are your Modales</div>
 		<script src="/sites/VSC/LOP%20%20Puma%20Scripts/scripts/LOP_Puma_template.js" type="text/javascript"></script>
 </html>
