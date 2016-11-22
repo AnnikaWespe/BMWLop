@@ -51,8 +51,9 @@ var createStamp = function(token) {
     var yyyy = date.getFullYear();
     var anmerkungInputFieldAlreadyClicked = 0;
     var $anmerkungInputField = $(".ms-rtestate-write.ms-rteflags-0.ms-rtestate-field").filter("[id*=Anmerkung]");
+    $anmerkungInputField.css('line-height: 1;');
     var helperParagraph = document.createElement("p");
-    helperParagraph.style.cssText = "style='line-height: 1;'"
+    //helperParagraph.style.cssText = "style='line-height: 1;'"
     if (dd < 10) {
         dd = '0' + dd
     }

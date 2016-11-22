@@ -44,6 +44,8 @@ var createStamp = function(token) {
     var anmerkungInputFieldAlreadyClicked = 0;
     var $anmerkungInputField = $(".ms-rtestate-write.ms-rteflags-0.ms-rtestate-field").filter("[id*=Anmerkung]");
     var timeStampParagraph = document.createElement("p");
+    $anmerkungInputField.css('line-height: 1;');
+
     timeStampParagraph.style.cssText = "style='line-height: 1;'"
     if (dd < 10) {
         dd = '0' + dd
