@@ -89,13 +89,14 @@ $(document).ready(function() {
 				$("#Kopieren").click(function() {
 					var targetList = $("#availableListsSelect").find(":selected").text();
 					var currentId = data[indexToCopy].getAttribute("ID");
-
 					var currentCopyHistory = data[indexToCopy].getAttribute("wq1z");
+					var currentTitle = data[indexToCopy].getAttribute("Title");
+					var currentAnmerkung = data[indexToCopy].getAttribute("Anmerkung");
 					var newCopyHistoryItem = getDate() + " von " + currentListName + " mit ID = " + currentId;
 					var updatedCopyHistory;
-
-					if (currentCopyHistory != null && !currentCopyHistory.isEmpty()) {
-						updatedCopyHistory = currentCopyHistory + "/n" + newCopyHistoryItem;
+					console.log(data[indexToCopy].getAttribute('body'));
+					if (currentCopyHistory != null) {
+						updatedCopyHistory = currentCopyHistory + ";" + newCopyHistoryItem;
 					} else {
 						updatedCopyHistory = newCopyHistoryItem;
 					};
@@ -103,13 +104,26 @@ $(document).ready(function() {
 					$SP().list(currentListName).update({
 						ID: currentId,
 						wq1z: updatedCopyHistory
+					}, {
+						success: function(items) {
+							$SP().list(targetList).add({
+								Title: currentTitle,
+								Anmerkung: currentAnmerkung
+							}, {
+								error: function(items) {
+									for (var i = 0; i < items.length; i++) console.log("Error '" + items[i].errorMessage + "' with:" + items[i].Title); // the 'errorMessage' attribute is added to the object
+								},
+								success: function(items) {
+									for (var i = 0; i < items.length; i++) console.log("Success for:" + items[i].Title + " (ID:" + items[i].ID + ")");
+								}
+							})
+						}
 					});
 				});
 			});
 		})
 	});
 })
-
 
 
 var getDate = function() {

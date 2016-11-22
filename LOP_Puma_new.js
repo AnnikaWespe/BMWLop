@@ -51,7 +51,8 @@ var createStamp = function(token) {
     var yyyy = date.getFullYear();
     var anmerkungInputFieldAlreadyClicked = 0;
     var $anmerkungInputField = $(".ms-rtestate-write.ms-rteflags-0.ms-rtestate-field").filter("[id*=Anmerkung]");
-    var helperParagraph = document.createElement("p style='line-height: 1;'");
+    var helperParagraph = document.createElement("p");
+    helperParagraph.style.cssText = "style='line-height: 1;'"
     if (dd < 10) {
         dd = '0' + dd
     }
@@ -59,12 +60,11 @@ var createStamp = function(token) {
         mm = '0' + mm
     }
     today = dd + '.' + mm + '.' + yyyy;
-    h
     userTimeStamp = document.createTextNode("(" + today + " " + token + ")");
     helperParagraph.appendChild(userTimeStamp);
     $anmerkungInputField.click(function() {
         if (!anmerkungInputFieldAlreadyClicked) {
-            $anmerkungInputField.appendChild(helperParagraph);
+            $anmerkungInputField.append(helperParagraph);
             anmerkungInputFieldAlreadyClicked = 1;
         };
     });
