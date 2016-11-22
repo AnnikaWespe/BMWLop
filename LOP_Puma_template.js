@@ -87,10 +87,42 @@ $(document).ready(function() {
 				});
 				document.getElementById("appendSelectHere").appendChild(availableListsSelect);
 				$("#Kopieren").click(function() {
-					console.log("Kopiere Index " + indexToCopy + " in Liste " + $("#availableListsSelect").find(":selected").text());
-					alert(data[indexToCopy].getAttribute("ID"));
+					var targetList = $("#availableListsSelect").find(":selected").text();
+					var currentId = data[indexToCopy].getAttribute("ID");
+
+					var currentCopyHistory = data[indexToCopy].getAttribute("wq1z");
+					var newCopyHistoryItem = getDate() + " von " + currentListName + " mit ID = " + currentId;
+					var updatedCopyHistory;
+
+					if (currentCopyHistory != null && !currentCopyHistory.isEmpty()) {
+						updatedCopyHistory = currentCopyHistory + "/n" + newCopyHistoryItem;
+					} else {
+						updatedCopyHistory = newCopyHistoryItem;
+					};
+					console.log(updatedCopyHistory);
+					$SP().list(currentListName).update({
+						ID: currentId,
+						wq1z: updatedCopyHistory
+					});
 				});
 			});
 		})
 	});
 })
+
+
+
+var getDate = function() {
+	var date = new Date();
+	var dd = date.getDate();
+	var mm = date.getMonth() + 1;
+	var yy = date.getFullYear().toString().substr(2, 2);
+	if (dd < 10) {
+		dd = '0' + dd
+	}
+	if (mm < 10) {
+		mm = '0' + mm
+	}
+	timeStamp = mm + '/' + yy;
+	return timeStamp;
+}

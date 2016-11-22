@@ -2,11 +2,12 @@
 
 $(document).ready(function() {
     $("input[title='Info']").val("/sites/VSC/SiteCollectionImages/Informationsign.png");
-    $("input[title='Info']").closest("tr").hide();
     $("input[title='Kopieren']").val("/sites/VSC/SiteCollectionImages/Copy.png");
+    $("input[title='Info']").closest("tr").hide();
     $("input[title='Kopieren']").closest("tr").hide();
     $("input[title='Copy History']").closest("tr").hide();
-    getTableData();
+    $("input[title='Titel Pflichtfeld']").closest("tr").hide()
+    $(".ms-rtestate-field p, p.ms-rteElement-P").css("line-height", "1");
     insertUserTimeStamp();
 })
 
@@ -56,7 +57,4 @@ var createStamp = function(token) {
             anmerkungInputFieldAlreadyClicked = 1;
         };
     });
-}
-var getTableData = function() {
-
 }

@@ -3,11 +3,13 @@
 $(document).ready(function() {
     var $offenerPunktInputField = $(".ms-rtestate-write.ms-rteflags-0.ms-rtestate-field").filter("[id*=Offener]");
     $("input[title='Info']").val("/sites/VSC/SiteCollectionImages/Informationsign.png");
-    $("input[title='Info']").closest("tr").hide();
     $("input[title='Kopieren']").val("/sites/VSC/SiteCollectionImages/Copy.png");
+    $("input[title='Info']").closest("tr").hide();
     $("input[title='Kopieren']").closest("tr").hide();
     $("input[title='Copy History']").closest("tr").hide();
+    $(".ms-rtestate-field p, p.ms-rteElement-P").css("line-height", "1");
     insertUserTimeStamp();
+    createTitle();
 })
 
 var insertUserTimeStamp = function() {
@@ -31,7 +33,14 @@ var insertUserTimeStamp = function() {
             alert('Error: ' + args.get_message() + '\n' + args.get_stackTrace());
         }
     );
+}
 
+var createTitle = function() {
+    var date = new Date();
+    var title = date.getTime();
+    var $titleField = $("input[title='Titel Pflichtfeld']");
+    $titleField.val(title);
+    $titleField.closest("tr").hide()
 }
 
 var createStamp = function(token) {
@@ -42,6 +51,7 @@ var createStamp = function(token) {
     var yyyy = date.getFullYear();
     var anmerkungInputFieldAlreadyClicked = 0;
     var $anmerkungInputField = $(".ms-rtestate-write.ms-rteflags-0.ms-rtestate-field").filter("[id*=Anmerkung]");
+    var helperParagraph = document.createElement("p style='line-height: 1;'");
     if (dd < 10) {
         dd = '0' + dd
     }
@@ -49,10 +59,12 @@ var createStamp = function(token) {
         mm = '0' + mm
     }
     today = dd + '.' + mm + '.' + yyyy;
-    userTimeStamp = "(" + today + " " + token + ")";
+    h
+    userTimeStamp = document.createTextNode("(" + today + " " + token + ")");
+    helperParagraph.appendChild(userTimeStamp);
     $anmerkungInputField.click(function() {
         if (!anmerkungInputFieldAlreadyClicked) {
-            $anmerkungInputField.append(document.createTextNode(userTimeStamp));
+            $anmerkungInputField.appendChild(helperParagraph);
             anmerkungInputFieldAlreadyClicked = 1;
         };
     });
