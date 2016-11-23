@@ -28,7 +28,7 @@ $(document).ready(function() {
 			nameDisplaynameMap[key] = value;
 			displaynameNameMap[value] = key;
 			nameColumnNumberMap[key] = i;
-			console.log(key + "    " + value);
+			console.log(value + " " + key);
 		};
 		$SP().list(currentListName).get(function(data) {
 			var arrayOfHiddenColumns = [columnGeaendertAm, columnGeaendertVon, columnErfasstAm, columnErstelltVon, columnCopyHistory];
@@ -87,11 +87,11 @@ $(document).ready(function() {
 				});
 				document.getElementById("appendSelectHere").appendChild(availableListsSelect);
 				$("#Kopieren").click(function() {
+					var updatedCopyHistory;
 					var targetList = $("#availableListsSelect").find(":selected").text();
 					var currentId = data[indexToCopy].getAttribute("ID");
 					var currentCopyHistory = data[indexToCopy].getAttribute("wq1z");
 					var currentTitle = data[indexToCopy].getAttribute("Title");
-					var currentAnmerkung = data[indexToCopy].getAttribute("Anmerkung");
 					var currentKopieren = data[indexToCopy].getAttribute("Kopieren");
 					var currentAnmerkung = data[indexToCopy].getAttribute("Anmerkung");
 					var currentModell = data[indexToCopy].getAttribute("Modell");
@@ -106,50 +106,55 @@ $(document).ready(function() {
 					var currentErstellt = data[indexToCopy].getAttribute("Created_x0020_Date");
 					var currentErstelltVon = data[indexToCopy].getAttribute("Author");
 					var currentGeaendertVon = data[indexToCopy].getAttribute("Editor");
-					var currentVerantwortliche = data[indexToCopy].getAttribute("Verantwortliche_x002f_r");
+					var currentVerantwortlicher = data[indexToCopy].getAttribute("Verantwortlicher");
 					var currentGeaendert = data[indexToCopy].getAttribute("Last_x0020_Modified");
 					var newCopyHistoryItem = getDate() + " von " + currentListName + " mit ID = " + currentId;
-					var updatedCopyHistory;
+					var entriesToCheck = [currentId, currentCopyHistory, currentTitle, currentAnmerkung, currentKopieren, currentModell, currentVscStatus, currentVppStatus, currentOffenerPunkt, currentAusleitung, currentDoku, currentInfo, currentEmail, currentLegende, currentErstellt, currentErstelltVon, currentGeaendert, currentGeaendertVon, currentVerantwortlicher, currentGeaendert];
+					var numberOfEntriesToCheck = entriesToCheck.length;
+					for (var i = 0; i < numberOfEntriesToCheck; i++) {
+						if (!entriesToCheck[i]) {
+							ent
+						}
+					};
 					if (currentCopyHistory != null) {
 						updatedCopyHistory = currentCopyHistory + ";" + newCopyHistoryItem;
 					} else {
 						updatedCopyHistory = newCopyHistoryItem;
 					};
+
 					$SP().list(currentListName).update({
 						ID: currentId,
 						wq1z: updatedCopyHistory
-					}, {
-						success: function(items) {
-							$SP().list(targetList).add({
-								Title: currentTitle,
-								Anmerkung: currentAnmerkung,
-								Kopieren: urlCopySign,
-								Info: urlInfoSign,
-								Modell: currentModell,
-								wq1z: updatedCopyHistory,
-								VSC_x002d_Status: currentVscStatus,
-								VPP_x0020_Status: currentVppStatus,
-								wq1z: currentCopyHistory,
-								Offener_x0020_Punkt: currentOffenerPunkt,
-								Ausleitung: currentAusleitung,
-								Doku: currentDoku,
-								Email: currentEmail,
-								f1za: currentLegende,
-								Created_x0020_Date: currentErstellt,
-								Author: currentErstelltVon,
-								Editor: currentGeaendertVon,
-								Verantwortliche_x002f_r: currentVerantwortliche,
-								Last_x0020_Modified: currentGeaendert,
-							}, {
-								error: function(items) {
-									for (var i = 0; i < items.length; i++) console.log("Error '" + items[i].errorMessage + "' with:" + items[i].Title); // the 'errorMessage' attribute is added to the object
-								},
-								success: function(items) {
-									for (var i = 0; i < items.length; i++) console.log("Success for:" + items[i].Title + " (ID:" + items[i].ID + ")");
-								}
-							})
-						}
 					});
+					$SP().list(targetList).add({
+						Kopieren: urlCopySign,
+						Info: urlInfoSign,
+						wq1z: updatedCopyHistory,
+
+						Title: currentTitle,
+						Anmerkung: currentAnmerkung,
+						Modell: currentModell,
+						VSC_x002d_Status: currentVscStatus,
+						VPP_x0020_Status: currentVppStatus,
+						wq1z: currentCopyHistory,
+						Offener_x0020_Punkt: currentOffenerPunkt,
+						Ausleitung: currentAusleitung,
+						Doku: currentDoku,
+						Email: currentEmail,
+						f1za: currentLegende,
+						Created_x0020_Date: currentErstellt,
+						Author: currentErstelltVon,
+						Editor: currentGeaendertVon,
+						Verantwortlicher: currentVerantwortlicher,
+						Last_x0020_Modified: currentGeaendert,
+					}, {
+						error: function(items) {
+							for (var i = 0; i < items.length; i++) console.log("Error '" + items[i].errorMessage + "' with:" + items[i].Title); // the 'errorMessage' attribute is added to the object
+						},
+						success: function(items) {
+							for (var i = 0; i < items.length; i++) console.log("Success for:" + items[i].Title + " (ID:" + items[i].ID + ")");
+						}
+					})
 				});
 			});
 		})
