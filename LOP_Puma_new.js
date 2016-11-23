@@ -1,13 +1,14 @@
 //Strings
 
 $(document).ready(function() {
-    var $offenerPunktInputField = $(".ms-rtestate-write.ms-rteflags-0.ms-rtestate-field").filter("[id*=Offener]");
+    var $offenerPunktRow = $("textarea[title='Offener Punkt']").closest("tr");
     $("input[title='Info']").val("/sites/VSC/SiteCollectionImages/Informationsign.png");
     $("input[title='Kopieren']").val("/sites/VSC/SiteCollectionImages/Copy.png");
     $("input[title='Info']").closest("tr").hide();
     $("input[title='Kopieren']").closest("tr").hide();
-    $("input[title='Copy History']").closest("tr").hide();
+    $("textarea[title='Copy History']").closest("tr").hide();
     $(".ms-rtestate-field p, p.ms-rteElement-P").css("line-height", "1");
+    $("nobr:contains('Textbaustein')").closest("tr").next().
     insertUserTimeStamp();
     createTitle();
 })
@@ -50,10 +51,8 @@ var createStamp = function(token) {
     var mm = date.getMonth() + 1;
     var yyyy = date.getFullYear();
     var anmerkungInputFieldAlreadyClicked = 0;
-    var $anmerkungInputField = $(".ms-rtestate-write.ms-rteflags-0.ms-rtestate-field").filter("[id*=Anmerkung]");
+    var $anmerkungInputField = $("textarea[title='** Anmerkung **']");
     var helperParagraph = document.createElement("p");
-    $anmerkungInputField.css('line-height: 1;');
-    helperParagraph.style.cssText = "style='line-height: 1;'";
     if (dd < 10) {
         dd = '0' + dd
     }

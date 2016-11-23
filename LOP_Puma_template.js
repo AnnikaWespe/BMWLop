@@ -16,7 +16,6 @@ $(document).ready(function() {
 	var relativeUrl = url.replace("https://vts5.bmwgroup.net", "");
 	var $copySigns = $("img[src='" + urlCopySign + "']");
 	currentListName = $("#pageTitle").find("a[href='" + relativeUrl + "']").text();
-
 	$SP().list(currentListName).info(function(fields) {
 		var nameDisplaynameMap = {};
 		var displaynameNameMap = {};
@@ -32,6 +31,7 @@ $(document).ready(function() {
 		};
 		$SP().list(currentListName).get(function(data) {
 			var arrayOfHiddenColumns = [columnGeaendertAm, columnGeaendertVon, columnErfasstAm, columnErstelltVon, columnCopyHistory];
+			var arrayOfColumnsWithAestheticProblems = [columnGeaendertVon, columnErstelltVon, columnErfasstAm, columnGeaendertAm];
 			var numberOfHiddenColumns = arrayOfHiddenColumns.length;
 			var numberOfRows = data.length;
 			for (var j = 0; j < numberOfRows; j++) {
@@ -44,7 +44,7 @@ $(document).ready(function() {
 					if (currentEntry == null) {
 						currentEntry = " ";
 					};
-					if (currentColumnName == columnGeaendertVon || currentColumnName == columnErstelltVon || currentColumnName == columnErfasstAm || currentColumnName == columnGeaendertAm) {
+					if (arrayOfColumnsWithAestheticProblems.indexOf(currentColumnName) !== -1) {
 						var helperArray = currentEntry.split("#");
 						currentEntry = helperArray[1];
 					}
@@ -72,7 +72,7 @@ $(document).ready(function() {
 				};
 				for (var i = 0; i < numberOfAvailableLists; i++) {
 					var currentListChecked = list[i]['Name'];
-					if (currentListChecked.indexOf("LOP") !== -1) {
+					if (currentListChecked.indexOf(typeOfList) !== -1) {
 						var option = document.createElement("option");
 						option.value = currentListChecked;
 						option.text = currentListChecked;
@@ -94,7 +94,7 @@ $(document).ready(function() {
 					var targetList = $("#availableListsSelect").find(":selected").text();
 					var currentId = data[indexToCopy].getAttribute("ID");
 					var currentCopyHistory = data[indexToCopy].getAttribute("wq1z");
-					var newCopyHistoryItem = getDate() + " von " + currentListName + " mit ID = " + currentId;
+					var newCopyHistoryItem = " " + getDate() + " von " + currentListName + " mit ID = " + currentId;
 					if (currentCopyHistory != null) {
 						updatedCopyHistory = currentCopyHistory + ";" + newCopyHistoryItem;
 					} else {
@@ -103,11 +103,10 @@ $(document).ready(function() {
 					for (var i = 0; i < numberOfRowsToCopy; i++) {
 						var currentColumnName = rowsToCopy[i];
 						var currentEntry = data[indexToCopy].getAttribute(currentColumnName);
-						console.log(currentEntry);
 						if (currentEntry == null) {
 							currentEntry = "";
 						};
-						if (currentColumnName == columnGeaendertVon || currentColumnName == columnErstelltVon || currentColumnName == columnErfasstAm || currentColumnName == columnGeaendertAm) {
+						if (arrayOfColumnsWithAestheticProblems.indexOf(currentColumnName) !== -1) {
 							var helperArray = currentEntry.split("#");
 							currentEntry = helperArray[1];
 						}
@@ -115,7 +114,7 @@ $(document).ready(function() {
 					};
 					$SP().list(currentListName).update({
 						ID: currentId,
-						wq1z: updatedCopyHistory
+						wq1z: updatedCopyHistory,
 					});
 					listItemToCopy.Kopieren = urlCopySign;
 					listItemToCopy.Info = urlInfoSign;
@@ -130,12 +129,15 @@ $(document).ready(function() {
 								$("button#Abbrechen").click();
 								alert("Erfolgreich kopiert");
 							}
-						})
+						}
+					);
+					console.log(data[indexToCopy].getAttribute("Attachments"));
 				});
 			});
 		})
 	});
 })
+
 
 
 var getDate = function() {
