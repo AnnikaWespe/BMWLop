@@ -18,7 +18,7 @@
 			<div id="appendSelectHere">
 			</div>
 			<a href="#" rel="modal:close">
-				<button class = "btn btn-default">Abbrechen</button>
+				<button class = "btn btn-default" id = "Abbrechen">Abbrechen</button>
 			</a>
 			<button class="btn btn-default" id="Kopieren" style="float: right">Kopieren</button>
 		</div>
