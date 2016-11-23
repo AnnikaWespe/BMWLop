@@ -92,15 +92,29 @@ $(document).ready(function() {
 					var currentCopyHistory = data[indexToCopy].getAttribute("wq1z");
 					var currentTitle = data[indexToCopy].getAttribute("Title");
 					var currentAnmerkung = data[indexToCopy].getAttribute("Anmerkung");
+					var currentKopieren = data[indexToCopy].getAttribute("Kopieren");
+					var currentAnmerkung = data[indexToCopy].getAttribute("Anmerkung");
+					var currentModell = data[indexToCopy].getAttribute("Modell");
+					var currentVscStatus = data[indexToCopy].getAttribute("VSC_x002d_Status");
+					var currentVppStatus = data[indexToCopy].getAttribute("VPP_x0020_Status");
+					var currentOffenerPunkt = data[indexToCopy].getAttribute("Offener_x0020_Punkt");
+					var currentAusleitung = data[indexToCopy].getAttribute("Ausleitung");
+					var currentDoku = data[indexToCopy].getAttribute("Doku");
+					var currentInfo = data[indexToCopy].getAttribute("Info");
+					var currentEmail = data[indexToCopy].getAttribute("Email");
+					var currentLegende = data[indexToCopy].getAttribute("f1za");
+					var currentErstellt = data[indexToCopy].getAttribute("Created_x0020_Date");
+					var currentErstelltVon = data[indexToCopy].getAttribute("Author");
+					var currentGeaendertVon = data[indexToCopy].getAttribute("Editor");
+					var currentVerantwortliche = data[indexToCopy].getAttribute("Verantwortliche_x002f_r");
+					var currentGeaendert = data[indexToCopy].getAttribute("Last_x0020_Modified");
 					var newCopyHistoryItem = getDate() + " von " + currentListName + " mit ID = " + currentId;
 					var updatedCopyHistory;
-					console.log(data[indexToCopy].getAttribute('body'));
 					if (currentCopyHistory != null) {
 						updatedCopyHistory = currentCopyHistory + ";" + newCopyHistoryItem;
 					} else {
 						updatedCopyHistory = newCopyHistoryItem;
 					};
-					console.log(updatedCopyHistory);
 					$SP().list(currentListName).update({
 						ID: currentId,
 						wq1z: updatedCopyHistory
@@ -108,7 +122,24 @@ $(document).ready(function() {
 						success: function(items) {
 							$SP().list(targetList).add({
 								Title: currentTitle,
-								Anmerkung: currentAnmerkung
+								Anmerkung: currentAnmerkung,
+								Kopieren: urlCopySign,
+								Info: urlInfoSign,
+								Modell: currentModell,
+								wq1z: updatedCopyHistory,
+								VSC_x002d_Status: currentVscStatus,
+								VPP_x0020_Status: currentVppStatus,
+								wq1z: currentCopyHistory,
+								Offener_x0020_Punkt: currentOffenerPunkt,
+								Ausleitung: currentAusleitung,
+								Doku: currentDoku,
+								Email: currentEmail,
+								f1za: currentLegende,
+								Created_x0020_Date: currentErstellt,
+								Author: currentErstelltVon,
+								Editor: currentGeaendertVon,
+								Verantwortliche_x002f_r: currentVerantwortliche,
+								Last_x0020_Modified: currentGeaendert,
 							}, {
 								error: function(items) {
 									for (var i = 0; i < items.length; i++) console.log("Error '" + items[i].errorMessage + "' with:" + items[i].Title); // the 'errorMessage' attribute is added to the object

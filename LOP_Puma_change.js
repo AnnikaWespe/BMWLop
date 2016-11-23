@@ -45,7 +45,6 @@ var createStamp = function(token) {
     var $anmerkungInputField = $(".ms-rtestate-write.ms-rteflags-0.ms-rtestate-field").filter("[id*=Anmerkung]");
     var timeStampParagraph = document.createElement("p");
     $anmerkungInputField.css('line-height: 1;');
-
     timeStampParagraph.style.cssText = "style='line-height: 1;'"
     if (dd < 10) {
         dd = '0' + dd
@@ -54,7 +53,7 @@ var createStamp = function(token) {
         mm = '0' + mm
     }
     today = dd + '.' + mm + '.' + yyyy;
-    userTimeStamp = "(" + today + " " + token + ")";
+    userTimeStamp = document.createTextNode("(" + today + " " + token + ")");
     timeStampParagraph.appendChild(userTimeStamp);
     $anmerkungInputField.click(function() {
         if (!anmerkungInputFieldAlreadyClicked) {
