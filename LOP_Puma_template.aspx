@@ -17,10 +17,12 @@
 			<p>In welche Liste wollen Sie die Daten kopieren?</p>
 			<div id="appendSelectHere">
 			</div>
-			<a href="#" rel="modal:close">
-				<button class = "btn btn-default" id = "Abbrechen">Abbrechen</button>
-			</a>
-			<button class="btn btn-default" id="Kopieren" style="float: right">Kopieren</button>
+			<div style="margin-top: 30px;">
+				<a href="#" rel="modal:close">
+					<button class = "btn btn-default" id = "Abbrechen">Abbrechen</button>
+				</a>
+				<button class="btn btn-default" id="Kopieren" style="float: right">Kopieren</button>
+			</div>
 		</div>
 	</div>
 	<script src="/sites/VSC/LOP%20%20Puma%20Scripts/scripts/LOP_Puma_template.js" type="text/javascript"></script>

@@ -1,5 +1,3 @@
-//Strings
-
 $(document).ready(function() {
     var $offenerPunktRow = $("textarea[title='Offener Punkt']").closest("tr");
     $("input[title='Info']").val("/sites/VSC/SiteCollectionImages/Informationsign.png");
@@ -7,33 +5,40 @@ $(document).ready(function() {
     $("input[title='Info']").closest("tr").hide();
     $("input[title='Kopieren']").closest("tr").hide();
     $("textarea[title='Copy History']").closest("tr").hide();
-    $(".ms-rtestate-field p, p.ms-rteElement-P").css("line-height", "1");
-    $("nobr:contains('Textbaustein')").closest("tr").next().
     insertUserTimeStamp();
     createTitle();
+    insertTextbaustein();
 })
 
 var insertUserTimeStamp = function() {
-    var context = new SP.ClientContext.get_current();
-    var web = context.get_web();
-    var currentUser = web.get_currentUser();
-    var timeStamp;
-    var userTimeStamp;
-    var today;
-    currentUser.retrieve();
-    context.load(web);
-    context.executeQueryAsync(
-        function() { //On success function
-            var userObject = web.get_currentUser();
-            var loginName = userObject.get_title();
-            var helperArray = loginName.split(" ");
-            userNameToken = helperArray[1].charAt(0) + helperArray[0].charAt(0);
-            createStamp(userNameToken);
-        },
-        function() { //On fail function
-            alert('Error: ' + args.get_message() + '\n' + args.get_stackTrace());
-        }
-    );
+    SP.SOD.executeFunc('sp.js', 'SP.ClientContext', execOperation);
+}
+
+var execOperation = function() {
+    try {
+        var context = new SP.ClientContext();
+        var web = context.get_web();
+        var currentUser = web.get_currentUser();
+        var timeStamp;
+        var userTimeStamp;
+        var today;
+        currentUser.retrieve();
+        context.load(web);
+        context.executeQueryAsync(
+            function() { //On success function
+                var userObject = web.get_currentUser();
+                var loginName = userObject.get_title();
+                var helperArray = loginName.split(" ");
+                userNameToken = helperArray[1].charAt(0) + helperArray[0].charAt(0);
+                createStamp(userNameToken);
+            },
+            function() { //On fail function
+                alert('Error: ' + args.get_message() + '\n' + args.get_stackTrace());
+            }
+        );
+    } catch (err) {
+        alert(err);
+    }
 }
 
 var createTitle = function() {
@@ -68,4 +73,22 @@ var createStamp = function(token) {
             anmerkungInputFieldAlreadyClicked = 1;
         };
     });
+}
+
+var insertTextbaustein = function() {
+    var $selectTextbaustein = $("select[title*='Offen']");
+    var $textareaOffenerPunkt = $("textarea[title='Offener Punkt']");
+    $selectTextbaustein.closest("tr").insertBefore($textareaOffenerPunkt);
+    $selectTextbaustein.find("option").each(function() {
+        var $this = $(this);
+        $this.click(function() {
+            if ($this.val()) {
+                var helperParagraph = document.createElement("p");
+                var textbausteinNode = document.createTextNode($this.text());
+                helperParagraph.appendChild(textbausteinNode);
+                $textareaOffenerPunkt.prepend(helperParagraph);
+            }
+
+        })
+    })
 }

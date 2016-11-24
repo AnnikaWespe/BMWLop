@@ -7,11 +7,56 @@ $(document).ready(function() {
     $("input[title='Kopieren']").closest("tr").hide();
     $("textarea[title='Copy History']").closest("tr").hide();
     $("input[title='Titel Pflichtfeld']").closest("tr").hide()
-    $(".ms-rtestate-field p, p.ms-rteElement-P").css("line-height", "1");
+    $("select[title*='Offen']").closest("tr").insertBefore($("textarea[title='Offener Punkt']").closest("tr"));
     insertUserTimeStamp();
 })
 
+/*        SP.SOD.executeFunc('sp.js', 'SP.ClientContext', execOperation);
+    });
+
+function execOperation() {
+        try {
+            clientContext = new SP.ClientContext.get_current();                   
+        }
+        catch (err) {
+            alert(err);
+        }*/
+
+
+
 var insertUserTimeStamp = function() {
+    SP.SOD.executeFunc('sp.js', 'SP.ClientContext', execOperation);
+}
+
+var execOperation = function() {
+    try {
+        context = new SP.ClientContext.get_current();
+        var web = context.get_web();
+        var currentUser = web.get_currentUser();
+        var timeStamp;
+        var userTimeStamp;
+        var today;
+        currentUser.retrieve();
+        context.load(web);
+        context.executeQueryAsync(
+            function() { //On success function
+                var userObject = web.get_currentUser();
+                var loginName = userObject.get_title();
+                var helperArray = loginName.split(" ");
+                userNameToken = helperArray[1].charAt(0) + helperArray[0].charAt(0);
+                createStamp(userNameToken);
+            },
+            function() { //On fail function
+                alert('Error: ' + args.get_message() + '\n' + args.get_stackTrace());
+            }
+        );
+    } catch (err) {
+        alert(err);
+    }
+}
+
+
+/*var insertUserTimeStamp = function() {
     var context = new SP.ClientContext.get_current();
     var web = context.get_web();
     var currentUser = web.get_currentUser();
@@ -33,7 +78,7 @@ var insertUserTimeStamp = function() {
         }
     );
 
-}
+}*/
 
 var createStamp = function(token) {
     var userNameToken;

@@ -29,33 +29,40 @@ $(document).ready(function() {
 			nameColumnNumberMap[key] = i;
 			console.log(value + " " + key);
 		};
-		$SP().list(currentListName).get(function(data) {
-			var arrayOfHiddenColumns = [columnGeaendertAm, columnGeaendertVon, columnErfasstAm, columnErstelltVon, columnCopyHistory];
-			var arrayOfColumnsWithAestheticProblems = [columnGeaendertVon, columnErstelltVon, columnErfasstAm, columnGeaendertAm];
-			var numberOfHiddenColumns = arrayOfHiddenColumns.length;
-			var numberOfRows = data.length;
-			for (var j = 0; j < numberOfRows; j++) {
-				infoText[j] = "";
-				for (var i = 0; i < numberOfHiddenColumns; i++) {
-					var currentColumnName = arrayOfHiddenColumns[i];
-					var currentColumnNumber = nameColumnNumberMap[currentColumnName];
-					var currentColumnDisplayName = nameDisplaynameMap[currentColumnName];
-					var currentEntry = data[j].getAttribute(currentColumnName);
-					if (currentEntry == null) {
-						currentEntry = " ";
+		var $infoSigns = $("img[src='" + urlInfoSign + "']");
+		$infoSigns.each(function(index, value) {
+			var $this = $(this);
+			var currentIndex = index;
+			$this.mouseover(function(index) {
+				$SP().list(currentListName).get(function(data) {
+					var arrayOfHiddenColumns = [columnGeaendertAm, columnGeaendertVon, columnErfasstAm, columnErstelltVon, columnCopyHistory];
+					var arrayOfColumnsWithAestheticProblems = [columnGeaendertVon, columnErstelltVon, columnErfasstAm, columnGeaendertAm];
+					var numberOfHiddenColumns = arrayOfHiddenColumns.length;
+					var infoText = "";
+					for (var i = 0; i < numberOfHiddenColumns; i++) {
+						var currentColumnName = arrayOfHiddenColumns[i];
+						var currentColumnNumber = nameColumnNumberMap[currentColumnName];
+						var currentColumnDisplayName = nameDisplaynameMap[currentColumnName];
+						var currentEntry = data[currentIndex].getAttribute(currentColumnName);
+						if (currentEntry == null) {
+							currentEntry = " ";
+						};
+						if (arrayOfColumnsWithAestheticProblems.indexOf(currentColumnName) !== -1) {
+							var helperArray = currentEntry.split("#");
+							currentEntry = helperArray[1];
+						}
+						infoText += currentColumnDisplayName + ": " + currentEntry + "&lt;br /&gt;";
 					};
-					if (arrayOfColumnsWithAestheticProblems.indexOf(currentColumnName) !== -1) {
-						var helperArray = currentEntry.split("#");
-						currentEntry = helperArray[1];
-					}
-					infoText[j] += currentColumnDisplayName + ": " + currentEntry + "&lt;br /&gt;";
-				};
-			};
-			var $infoSigns = $("img[src='" + urlInfoSign + "']");
-			$infoSigns.each(function(index, value) {
-				$(this).wrap(bootstrapTooltip + infoText[index] + '"></a>');
-				$(this).closest("a").tooltip();
-			});
+					$this.wrap(bootstrapTooltip + infoText + '"></a>');
+					$this.closest("a").tooltip();
+				})
+			})
+		});
+
+
+		$SP().list(currentListName).get(function(data) {
+			var arrayOfColumnsWithAestheticProblems = [columnGeaendertVon, columnErstelltVon, columnErfasstAm, columnGeaendertAm];
+			var numberOfRows = data.length;
 			$SP().lists(function(list) {
 				var availableListsSelect = document.createElement("select");
 				var numberOfAvailableLists = list.length;
