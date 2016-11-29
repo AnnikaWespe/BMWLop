@@ -9,19 +9,8 @@ $(document).ready(function() {
     $("input[title='Titel Pflichtfeld']").closest("tr").hide()
     $("select[title*='Offen']").closest("tr").insertBefore($("textarea[title='Offener Punkt']").closest("tr"));
     insertUserTimeStamp();
+    insertTextbaustein();
 })
-
-/*        SP.SOD.executeFunc('sp.js', 'SP.ClientContext', execOperation);
-    });
-
-function execOperation() {
-        try {
-            clientContext = new SP.ClientContext.get_current();                   
-        }
-        catch (err) {
-            alert(err);
-        }*/
-
 
 
 var insertUserTimeStamp = function() {
@@ -56,30 +45,6 @@ var execOperation = function() {
 }
 
 
-/*var insertUserTimeStamp = function() {
-    var context = new SP.ClientContext.get_current();
-    var web = context.get_web();
-    var currentUser = web.get_currentUser();
-    var timeStamp;
-    var userTimeStamp;
-    var today;
-    currentUser.retrieve();
-    context.load(web);
-    context.executeQueryAsync(
-        function() { //On success function
-            var userObject = web.get_currentUser();
-            var loginName = userObject.get_title();
-            var helperArray = loginName.split(" ");
-            userNameToken = helperArray[1].charAt(0) + helperArray[0].charAt(0);
-            createStamp(userNameToken);
-        },
-        function() { //On fail function
-            alert('Error: ' + args.get_message() + '\n' + args.get_stackTrace());
-        }
-    );
-
-}*/
-
 var createStamp = function(token) {
     var userNameToken;
     var date = new Date();
@@ -104,4 +69,18 @@ var createStamp = function(token) {
             anmerkungInputFieldAlreadyClicked = 1;
         };
     });
+}
+
+var insertTextbaustein = function() {
+    var $selectTextbaustein = $("select[title*='Offen']");
+    var $textareaOffenerPunkt = $("textarea[title='Offener Punkt']");
+    $selectTextbaustein.closest("tr").insertBefore($textareaOffenerPunkt);
+    $selectTextbaustein.find("option").each(function() {
+        var $this = $(this);
+        $this.click(function() {
+            if ($this.val() != 0) {
+                $textareaOffenerPunkt.prepend($this.text() + " ");
+            }
+        })
+    })
 }

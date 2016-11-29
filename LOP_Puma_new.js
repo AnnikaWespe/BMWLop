@@ -82,13 +82,9 @@ var insertTextbaustein = function() {
     $selectTextbaustein.find("option").each(function() {
         var $this = $(this);
         $this.click(function() {
-            if ($this.val()) {
-                var helperParagraph = document.createElement("p");
-                var textbausteinNode = document.createTextNode($this.text());
-                helperParagraph.appendChild(textbausteinNode);
-                $textareaOffenerPunkt.prepend(helperParagraph);
+            if ($this.val() != 0) {
+                $textareaOffenerPunkt.prepend($this.text() + " ");
             }
-
         })
     })
 }
