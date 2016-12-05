@@ -101,6 +101,9 @@ $(document).ready(function() {
 					var targetList = $("#availableListsSelect").find(":selected").text();
 					var currentId = data[indexToCopy].getAttribute("ID");
 					var currentCopyHistory = data[indexToCopy].getAttribute("wq1z");
+					var currentTitle = data[indexToCopy].getAttribute("Title");
+					var attachmentHelper = (data[indexToCopy].getAttribute("Attachments")).split(";#")[1];
+					console.log(attachmentHelper);
 					var newCopyHistoryItem = " " + getDate() + " von " + currentListName + " mit ID = " + currentId;
 					if (currentCopyHistory != null) {
 						updatedCopyHistory = currentCopyHistory + ";" + newCopyHistoryItem;
@@ -133,19 +136,81 @@ $(document).ready(function() {
 								alert("Es ist ein Fehler aufgetreten.");
 							},
 							success: function(items) {
+								if (attachmentHelper) {
+									var attachmentsUrl = attachmentHelper.split(".net")[1].split("/Attachments/")[0] + "/Attachments/" + currentId;
+									getAttachments(currentTitle, attachmentsUrl, targetList);
+								};
 								$("button#Abbrechen").click();
 								alert("Erfolgreich kopiert");
 							}
 						}
 					);
-					console.log(data[indexToCopy].getAttribute("Attachments"));
 				});
 			});
 		})
 	});
 })
 
+var getAttachments = function(title, attachmentsUrl, targetList) {
+	var context = new SP.ClientContext();
+	var web = context.get_web();
+	var srcFolder = web.getFolderByServerRelativeUrl(attachmentsUrl);
+	var attachments = srcFolder.get_files();
+	var encodedFilesArray = [];
+	context.load(attachments);
+	context.executeQueryAsync(
+		function() {
+			var numberOfAttachments = attachments.get_count();
+			for (var i = 0; i < numberOfAttachments; i++) {
+				var currentFile = attachments.getItemAtIndex(i);
+				copyAttachment(currentFile, title, targetList, context);
+			}
+		},
+		function() {
+			alert('Es gab ein Problem beim Kopieren der Anhänge: ' + args.get_message() + '\n' + args.get_stackTrace());
+		}
+	);
+}
 
+var copyAttachment = function(file, title, targetList, ctx) {
+	var currentFileName = file.get_name();
+	console.log(currentFileName);
+	// var reader = new FileReader();
+	// reader.readAsArrayBuffer(file.get_objectData());
+	file.copyTo("/sites/VSC/Lists/LOP Liste Test 2/Attachments/20/BernhardRockt.pdf", true);
+	ctx.executeQueryAsync(
+		function() {},
+		function(sender, args) {
+			//onQueryFailed(sender, args);
+		}
+	);
+
+
+}
+
+function previewFile() {
+	var preview = document.querySelector('img');
+	var file = document.querySelector('input[type=file]').files[0];
+
+	reader.addEventListener("load", function() {
+		preview.src = reader.result;
+	}, false);
+
+	if (file) {
+		reader.readAsDataURL(file);
+	}
+}
+
+/*	var deferred = jQuery.Deferred();
+	var reader = new FileReader();
+	reader.onloadend = function(e) {
+		deferred.resolve(e.target.result);
+	}
+	reader.onerror = function(e) {
+		deferred.reject(e.target.error);
+	}
+	reader.readAsArrayBuffer(file);
+	return deferred.promise();*/
 
 var getDate = function() {
 	var date = new Date();
