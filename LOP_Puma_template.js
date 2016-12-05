@@ -136,12 +136,11 @@ $(document).ready(function() {
 								alert("Es ist ein Fehler aufgetreten.");
 							},
 							success: function(items) {
+								var idInNewList = items[0].ID;
 								if (attachmentHelper) {
 									var attachmentsUrl = attachmentHelper.split(".net")[1].split("/Attachments/")[0] + "/Attachments/" + currentId;
-									getAttachments(currentTitle, attachmentsUrl, targetList);
-								};
-								$("button#Abbrechen").click();
-								alert("Erfolgreich kopiert");
+									createAttachmentFolder(attachmentsUrl, targetList, idInNewList);
+								}
 							}
 						}
 					);
@@ -150,20 +149,32 @@ $(document).ready(function() {
 		})
 	});
 })
+var createAttachmentFolder = function(attachmentsUrl, targetList, idInNewList) {
+	$SP().list(targetList).addAttachment({
+		ID: idInNewList,
+		filename: "dummyAttachment.txt",
+		attachment: "U2hhcmVwb2ludFBsdXMgUm9ja3Mh",
+		after: getAttachments(attachmentsUrl, targetList, idInNewList)
+	});
+}
 
-var getAttachments = function(title, attachmentsUrl, targetList) {
+
+
+
+var getAttachments = function(attachmentsUrl, targetList, idInNewList) {
 	var context = new SP.ClientContext();
 	var web = context.get_web();
 	var srcFolder = web.getFolderByServerRelativeUrl(attachmentsUrl);
 	var attachments = srcFolder.get_files();
-	var encodedFilesArray = [];
+	$("button#Abbrechen").click();
+	alert("Erfolgreich kopiert");
 	context.load(attachments);
 	context.executeQueryAsync(
 		function() {
 			var numberOfAttachments = attachments.get_count();
 			for (var i = 0; i < numberOfAttachments; i++) {
 				var currentFile = attachments.getItemAtIndex(i);
-				copyAttachment(currentFile, title, targetList, context);
+				copyAttachment(currentFile, targetList, context, idInNewList);
 			}
 		},
 		function() {
@@ -172,45 +183,19 @@ var getAttachments = function(title, attachmentsUrl, targetList) {
 	);
 }
 
-var copyAttachment = function(file, title, targetList, ctx) {
+var copyAttachment = function(file, targetList, ctx, idInNewList) {
 	var currentFileName = file.get_name();
 	console.log(currentFileName);
 	// var reader = new FileReader();
 	// reader.readAsArrayBuffer(file.get_objectData());
-	file.copyTo("/sites/VSC/Lists/LOP Liste Test 2/Attachments/20/BernhardRockt.pdf", true);
+	file.copyTo("/sites/VSC/Lists/LOP Liste Test 2/Attachments/" + idInNewList + "/" + currentFileName, true);
 	ctx.executeQueryAsync(
 		function() {},
 		function(sender, args) {
 			//onQueryFailed(sender, args);
 		}
 	);
-
-
 }
-
-function previewFile() {
-	var preview = document.querySelector('img');
-	var file = document.querySelector('input[type=file]').files[0];
-
-	reader.addEventListener("load", function() {
-		preview.src = reader.result;
-	}, false);
-
-	if (file) {
-		reader.readAsDataURL(file);
-	}
-}
-
-/*	var deferred = jQuery.Deferred();
-	var reader = new FileReader();
-	reader.onloadend = function(e) {
-		deferred.resolve(e.target.result);
-	}
-	reader.onerror = function(e) {
-		deferred.reject(e.target.error);
-	}
-	reader.readAsArrayBuffer(file);
-	return deferred.promise();*/
 
 var getDate = function() {
 	var date = new Date();
