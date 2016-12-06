@@ -140,7 +140,6 @@ $(document).ready(function() {
 								if (attachmentHelper) {
 									var context = new SP.ClientContext();
 									var attachmentsOriginUrl = attachmentHelper.split(".net")[1].split("/Attachments/")[0] + "/Attachments/" + currentId;
-									console.log(attachmentsOriginUrl);
 									createAttachmentFolder(attachmentsOriginUrl, targetList, idInNewList);
 								}
 							}
@@ -158,7 +157,6 @@ var createAttachmentFolder = function(attachmentsOriginUrl, targetList, idInNewL
 		attachment: "U2hhcmVwb2ludFBsdXMgUm9ja3Mh",
 		after: function(fileUrl) {
 			dummyAttachmentUrl = fileUrl;
-			console.log(fileUrl);
 			copyAttachments(attachmentsOriginUrl, targetList, idInNewList)
 		}
 	});
@@ -184,12 +182,9 @@ var copyAttachments = function(attachmentsOriginUrl, targetList, idInNewList) {
 				var currentFile = attachments.getItemAtIndex(i);
 				var currentFileName = currentFile.get_name();
 				var targetUrl = "/sites/VSC/Lists/" + targetList + "/Attachments/" + idInNewList + "/" + currentFileName;
-				console.log("targetUrl: " + targetUrl);
-				console.log(currentFileName);
 				currentFile.copyTo(targetUrl, false);
 				context.executeQueryAsync(
 					function() {
-						console.log(currentFileName + " copied");
 					},
 					function(sender, args) {
 						//onQueryFailed(sender, args);
