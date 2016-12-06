@@ -8,6 +8,7 @@ var urlInfoSign = '/sites/VSC/SiteCollectionImages/Informationsign.png';
 var urlCopySign = "/sites/VSC/SiteCollectionImages/Copy.png";
 var bootstrapTooltip = '<a href="#" data-html="true" data-toggle="tooltip" style ="white-space: pre-wrap;min-width: 100px;" title="';
 var currentListName;
+var dummyAttachmentUrl;
 
 
 $(document).ready(function() {
@@ -103,7 +104,6 @@ $(document).ready(function() {
 					var currentCopyHistory = data[indexToCopy].getAttribute("wq1z");
 					var currentTitle = data[indexToCopy].getAttribute("Title");
 					var attachmentHelper = (data[indexToCopy].getAttribute("Attachments")).split(";#")[1];
-					console.log(attachmentHelper);
 					var newCopyHistoryItem = " " + getDate() + " von " + currentListName + " mit ID = " + currentId;
 					if (currentCopyHistory != null) {
 						updatedCopyHistory = currentCopyHistory + ";" + newCopyHistoryItem;
@@ -138,8 +138,10 @@ $(document).ready(function() {
 							success: function(items) {
 								var idInNewList = items[0].ID;
 								if (attachmentHelper) {
-									var attachmentsUrl = attachmentHelper.split(".net")[1].split("/Attachments/")[0] + "/Attachments/" + currentId;
-									createAttachmentFolder(attachmentsUrl, targetList, idInNewList);
+									var context = new SP.ClientContext();
+									var attachmentsOriginUrl = attachmentHelper.split(".net")[1].split("/Attachments/")[0] + "/Attachments/" + currentId;
+									console.log(attachmentsOriginUrl);
+									createAttachmentFolder(attachmentsOriginUrl, targetList, idInNewList);
 								}
 							}
 						}
@@ -149,22 +151,26 @@ $(document).ready(function() {
 		})
 	});
 })
-var createAttachmentFolder = function(attachmentsUrl, targetList, idInNewList) {
+var createAttachmentFolder = function(attachmentsOriginUrl, targetList, idInNewList) {
 	$SP().list(targetList).addAttachment({
 		ID: idInNewList,
 		filename: "dummyAttachment.txt",
 		attachment: "U2hhcmVwb2ludFBsdXMgUm9ja3Mh",
-		after: getAttachments(attachmentsUrl, targetList, idInNewList)
+		after: function(fileUrl) {
+			dummyAttachmentUrl = fileUrl;
+			console.log(fileUrl);
+			copyAttachments(attachmentsOriginUrl, targetList, idInNewList)
+		}
 	});
 }
 
 
 
-
-var getAttachments = function(attachmentsUrl, targetList, idInNewList) {
+var copyAttachments = function(attachmentsOriginUrl, targetList, idInNewList) {
+	alert("copyAttachments");
 	var context = new SP.ClientContext();
 	var web = context.get_web();
-	var srcFolder = web.getFolderByServerRelativeUrl(attachmentsUrl);
+	var srcFolder = web.getFolderByServerRelativeUrl(attachmentsOriginUrl);
 	var attachments = srcFolder.get_files();
 	$("button#Abbrechen").click();
 	alert("Erfolgreich kopiert");
@@ -172,27 +178,27 @@ var getAttachments = function(attachmentsUrl, targetList, idInNewList) {
 	context.executeQueryAsync(
 		function() {
 			var numberOfAttachments = attachments.get_count();
+			var dummy = web.getFileByServerRelativeUrl(dummyAttachmentUrl);
+			dummy.deleteObject();
 			for (var i = 0; i < numberOfAttachments; i++) {
 				var currentFile = attachments.getItemAtIndex(i);
-				copyAttachment(currentFile, targetList, context, idInNewList);
-			}
+				var currentFileName = currentFile.get_name();
+				var targetUrl = "/sites/VSC/Lists/" + targetList + "/Attachments/" + idInNewList + "/" + currentFileName;
+				console.log("targetUrl: " + targetUrl);
+				console.log(currentFileName);
+				currentFile.copyTo(targetUrl, false);
+				context.executeQueryAsync(
+					function() {
+						console.log(currentFileName + " copied");
+					},
+					function(sender, args) {
+						//onQueryFailed(sender, args);
+					}
+				);
+			};
 		},
 		function() {
 			alert('Es gab ein Problem beim Kopieren der Anhänge: ' + args.get_message() + '\n' + args.get_stackTrace());
-		}
-	);
-}
-
-var copyAttachment = function(file, targetList, ctx, idInNewList) {
-	var currentFileName = file.get_name();
-	console.log(currentFileName);
-	// var reader = new FileReader();
-	// reader.readAsArrayBuffer(file.get_objectData());
-	file.copyTo("/sites/VSC/Lists/LOP Liste Test 2/Attachments/" + idInNewList + "/" + currentFileName, true);
-	ctx.executeQueryAsync(
-		function() {},
-		function(sender, args) {
-			//onQueryFailed(sender, args);
 		}
 	);
 }
