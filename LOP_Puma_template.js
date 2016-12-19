@@ -15,8 +15,10 @@ $(document).ready(function() {
 	//get name of current list
 	var url = window.location.href;
 	var relativeUrl = url.replace("https://vts5.bmwgroup.net", "");
+	var urlSnippet = relativeUrl.split("/Lists/")[1].split("/")[0];
 	var $copySigns = $("img[src='" + urlCopySign + "']");
-	currentListName = $("#pageTitle").find("a[href='" + relativeUrl + "']").text();
+	currentListName = $("#pageTitle").find("span").find("span").find("span").find("a").text();
+	//currentListName = $("#pageTitle").find("a[href='" + relativeUrl + "']").text();
 	$SP().list(currentListName).info(function(fields) {
 		var nameDisplaynameMap = {};
 		var displaynameNameMap = {};
@@ -28,7 +30,6 @@ $(document).ready(function() {
 			nameDisplaynameMap[key] = value;
 			displaynameNameMap[value] = key;
 			nameColumnNumberMap[key] = i;
-			console.log(value + " " + key);
 		};
 		var $infoSigns = $("img[src='" + urlInfoSign + "']");
 		$infoSigns.each(function(index, value) {
@@ -80,7 +81,7 @@ $(document).ready(function() {
 				};
 				for (var i = 0; i < numberOfAvailableLists; i++) {
 					var currentListChecked = list[i]['Name'];
-					if (currentListChecked.indexOf(typeOfList) !== -1) {
+					if (currentListChecked.indexOf(typeOfList) !== -1 && currentListChecked.indexOf("Scripts") == -1) {
 						var option = document.createElement("option");
 						option.value = currentListChecked;
 						option.text = currentListChecked;
@@ -120,7 +121,7 @@ $(document).ready(function() {
 							var helperArray = currentEntry.split("#");
 							currentEntry = helperArray[1];
 						}
-						listItemToCopy[rowsToCopy[i]] = currentEntry;
+						listItemToCopy[currentColumnName] = currentEntry;
 					};
 					$SP().list(currentListName).update({
 						ID: currentId,
@@ -137,6 +138,8 @@ $(document).ready(function() {
 							},
 							success: function(items) {
 								var idInNewList = items[0].ID;
+								$("button#Abbrechen").click();
+								alert("Erfolgreich kopiert");
 								if (attachmentHelper) {
 									var context = new SP.ClientContext();
 									var attachmentsOriginUrl = attachmentHelper.split(".net")[1].split("/Attachments/")[0] + "/Attachments/" + currentId;
@@ -165,13 +168,10 @@ var createAttachmentFolder = function(attachmentsOriginUrl, targetList, idInNewL
 
 
 var copyAttachments = function(attachmentsOriginUrl, targetList, idInNewList) {
-	alert("copyAttachments");
 	var context = new SP.ClientContext();
 	var web = context.get_web();
 	var srcFolder = web.getFolderByServerRelativeUrl(attachmentsOriginUrl);
 	var attachments = srcFolder.get_files();
-	$("button#Abbrechen").click();
-	alert("Erfolgreich kopiert");
 	context.load(attachments);
 	context.executeQueryAsync(
 		function() {
@@ -184,8 +184,7 @@ var copyAttachments = function(attachmentsOriginUrl, targetList, idInNewList) {
 				var targetUrl = "/sites/VSC/Lists/" + targetList + "/Attachments/" + idInNewList + "/" + currentFileName;
 				currentFile.copyTo(targetUrl, false);
 				context.executeQueryAsync(
-					function() {
-					},
+					function() {},
 					function(sender, args) {
 						//onQueryFailed(sender, args);
 					}

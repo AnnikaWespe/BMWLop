@@ -1,4 +1,6 @@
 var googleChartsColors = ["#3366CC", "#DC3912", "#FF9900", "#109618", "#990099", "#0099C6", "#DD4477", "#66AA00", "#B82E2E", "#316395", "#994499", "#22AA99", "# AAA11", "#6633CC", "#E67300", "#8B0707", "#329262", "#5574A6", "#3B3EAC"];
+var totalNumberOfItems = 0;
+var totalNumberOfModels = 0;
 
 $(document).ready(function() {
     var modellStat = {};
@@ -27,29 +29,32 @@ $(document).ready(function() {
         for (var i = 0; i < numberOfAvailableLists; i++) {
             var currentListName = list[i]['Name'];
             var helperArray = currentListName.split(" ");
-            if (helperArray[0] == "LOP" && helperArray[3] != "Scripts") {
+            if (helperArray[0] == "LOP" && helperArray[3] != "Scripts" && helperArray[1] != "MediaPool") {
                 availableLopLists.push(currentListName);
             }
         };
-        console.log(availableLopLists);
         numberOfLopLists = availableLopLists.length;
         loopThroughLists(availableLopLists, numberOfLopLists);
 
-        console.log("i: " + i + " on list " + availableLopLists[i]);
     });
 
     var loopThroughLists = function(listOfLists, maxNumber) {
         $SP().list(listOfLists[loopVariable]).get(function(data) {
-            // console.log("i: " + i + " on list " + availableLopLists[i]);
             var numberOfRows = data.length;
-            console.log(numberOfRows);
             for (var j = 0; j < numberOfRows; j++) {
+                totalNumberOfItems++;
                 var currentModell = data[j].getAttribute("Modell") || "keine Angabe";
                 var currentStatus = data[j].getAttribute("VSC_x002d_Status") || "keine Angabe";
                 var currentAusleitung = data[j].getAttribute("Ausleitung") || "keine Angabe";
                 var currentVerantwortlicher = data[j].getAttribute("Verantwortlicher") || "keine Angabe";
                 //initialize at 1 or increment according object properties 
-                modellStat[currentModell] = ++modellStat[currentModell] || 1;
+                var currentModellArray = currentModell.split(";#");
+                var numberOfModels = currentModellArray.length - 1;
+                for (var i = 1; i < numberOfModels; i++) {
+                    modellStat[currentModellArray[i]] = ++modellStat[currentModellArray[i]] || 1;
+                    totalNumberOfModels++;
+                }
+                // modellStat[currentModell] = ++modellStat[currentModell] || 1;
                 statusStat[currentStatus] = ++statusStat[currentStatus] || 1;
                 ausleitungStat[currentAusleitung] = ++ausleitungStat[currentAusleitung] || 1;
                 verantwortlicherStat[currentVerantwortlicher] = ++verantwortlicherStat[currentVerantwortlicher] || 1;
@@ -75,14 +80,6 @@ $(document).ready(function() {
         for (key in verantwortlicherStat) {
             verantwortlicherStatArray.push([key, verantwortlicherStat[key]]);
         };
-        console.log(modellStatArray);
-        console.log(verantwortlicherStatArray);
-        console.log(ausleitungStatArray);
-        console.log(statusStatArray);
-        console.log(modellStat);
-        console.log(statusStat);
-        console.log(ausleitungStat);
-        console.log(verantwortlicherStat);
         insertData(modellStatArray, statusStatArray, ausleitungStatArray, verantwortlicherStatArray);
     };
 })
@@ -146,7 +143,11 @@ var createTable = function(array, id) {
     tableString += array[0][0] + "</th><th>" + array[0][1] + "</th></tr>";
     for (var i = 1; i < numberOfOptions; i++) {
         tableString += "</tr><td class='showColor'><div class = 'showColor' style= 'background-color:" + googleChartsColors[i - 1] + "''></div></td><td>" + array[i][0] + "</td><td>" + array[i][1] + "</td></tr>";
-        console.log(array[i][1]);
+    }
+    if (array[0][0] == "Modell") {
+        tableString += "<tr><td style= 'border-style: none'></td><td style='border-style: none'></td><td>Gesamt: " + totalNumberOfModels + "</td> </tr>";
+    } else {
+        tableString += "<tr><td style= 'border-style: none'></td><td style='border-style: none'></td><td>Gesamt: " + totalNumberOfItems + "</td> </tr>";
     }
     $("#" + id).append(tableString);
 }

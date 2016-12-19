@@ -6,8 +6,10 @@ $(document).ready(function() {
         for (var i = 0; i < numberOfLists; i++) {
             var currentList = list[i]['Name'];
             if (currentList.indexOf("LOP") !== -1 || currentList.indexOf("PUMA") !== -1 || currentList.indexOf("MeP") !== -1) {
-                listsAvailableForDelete.push(currentList);
-                numberOfListsAvailableForDelete++;
+                if (currentList.indexOf("Scripts") == -1) {
+                    listsAvailableForDelete.push(currentList);
+                    numberOfListsAvailableForDelete++;
+                }
             }
         };
         createListSelect(listsAvailableForDelete, numberOfListsAvailableForDelete);
@@ -20,6 +22,9 @@ $(document).ready(function() {
 var createListSelect = function(listArray, number) {
     var availableListsSelect = document.createElement("select");
     availableListsSelect.id = "my_availableListsSelect";
+    var defaultOption = document.createElement("option");
+    defaultOption.text = "...";
+    availableListsSelect.appendChild(defaultOption);
     for (var i = 0; i < number; i++) {
         var option = document.createElement("option");
         var currentList = listArray[i]
